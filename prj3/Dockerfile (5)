@@ -1,0 +1,5 @@
+FROM openjdk:alpine
+WORKDIR /app 
+COPY ./soft.jar . 
+#RUN java -jar soft.jar
+CMD ["java", "-jar", "soft.jar"]

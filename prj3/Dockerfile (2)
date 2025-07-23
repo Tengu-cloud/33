@@ -1,0 +1,9 @@
+FROM nginx:alpine
+
+WORKDIR /app
+
+COPY . . 
+
+VOLUME ~/Documents/docker/nginx.conf: /app/etc/nginx/
+
+CMD ["nginx", "-g", "daemon off;"]
