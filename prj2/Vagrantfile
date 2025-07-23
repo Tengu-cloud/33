@@ -1,0 +1,22 @@
+Vagrant.configure("2") do |config|
+  config.vm.box = "rocky999"
+
+  config.vm.define "vm3" do |vm3|
+    vm3.vm.provider "virtualbox" do |vb|
+      vb.name = "vm3"
+      vb.memory = 8000
+      vb.cpus = 2
+    end
+#    config.vm.synced_folder settings:  owner: "vagrant", group: "vagrant"    
+    vm3.vm.network "forwarded_port", guest: 22, host: 4444, id: "ssh", protocol: "tcp"
+
+    vm3.vm.provision "file", source: "Dockerfile", destination: "/app/Dockerfile"
+    vm3.vm.provision "file", source: "http_serv.py", destination: "/app/http_serv.py"
+    vm3.vm.provision "file", source: "setup.sh", destination: "/tmp/setup.sh"
+    config.vm.synced_folder "/home/naraka/kasp/var3", "/home/vagrant/"
+    vm3.vm.provision "shell", inline: "chmod +x /tmp/setup.sh && /tmp/setup.sh"
+    vm3.vm.provision "shell", inline: "echo "vagrant:1234" | chpasswd"
+    config.ssh.username = "vagrant"
+    config.ssh.private_key_path = "/home/naraka/.ssh/id_rsa"
+   end
+end

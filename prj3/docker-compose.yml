@@ -1,0 +1,14 @@
+version: '3'
+services:
+  nginx:  
+    image: nginx 
+    volumes: 
+        - /home/anton/Documents/docker/java_conf:/etc/nginx/conf.d
+    ports: 
+        - 81:81
+    container_name: nginx     
+  java-app:
+    image: java_app
+    ports: 
+        - 9501:8080
+    container_name: java_app 

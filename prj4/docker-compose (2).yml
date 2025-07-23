@@ -1,0 +1,32 @@
+version: '3'
+services:
+  postgres: 
+    image: postgres1
+    ports: 
+      - 5432:5432
+    container_name: postgres
+    healthcheck:
+        test: ["CMD", "curl", "-f", "http://postgres:5432"]
+        interval: 30s
+        timeout: 10s
+        retries: 5
+    volumes:
+      - pgsql:/opt/postgres
+    
+  datomic:
+    image: datomic 
+    ports:
+      - 4334:4334
+    container_name: datomic
+    volumes: 
+      - /home/anton/Documents/docker/pq/Datomic/datomic-pro-1.0.6610/config/samples/sql-transactor-template.properties:/etc/datomic-pro-1.0.6610/config/true/sql-transactor-template.properties
+    links:
+      - postgres
+    depends_on: 
+      - postgres
+volumes:
+  pgsql:
+       
+    
+    #environment:
+     # WAIT_HOSTS: postgres:5432

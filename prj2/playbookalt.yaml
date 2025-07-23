@@ -1,0 +1,82 @@
+---
+- name: Установка Docker CE на Rocky Linux
+  hosts: vm
+  become: true
+
+  tasks:
+    - name: Установить dnf-utils для управления репозиториями
+      dnf:
+        name: dnf-utils
+        state: present
+
+    - name: Добавить репозиторий Docker CE
+      command: dnf config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+      register: add_repo
+      changed_when: add_repo.rc == 0
+
+    - name: Установить Docker CE, CLI и containerd
+      dnf:
+        name:
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+        state: present
+- name: Установить и запустить HTTP сервер в Docker
+  hosts: vm
+  become: yes  # Используем sudo
+  tasks:
+  
+    - name: Установить необходимые пакеты
+      yum:
+        name:
+          - python3
+          - python3-pip
+         
+        state: present
+
+    - name: Установить зависимости Python
+      pip:
+        name: prometheus_client
+        executable: pip
+   
+    - name: dock     
+      pip: 
+        name: docker
+        executable: pip
+
+    - name: Запустить Docker
+      systemd:
+        name: docker
+        state: started
+        enabled: yes
+
+    - name: Копировать Dockerfile на ВМ
+      copy:
+        src: /app1/Dockerfile
+        dest: /app/Dockerfile
+
+    - name: Копировать сервер на ВМ
+      copy:
+        src: /app1/http_serv.py
+        dest: /app/http_serv.py
+        mode: '0777'
+
+    - name: Создать Docker образ
+      command: >
+        docker build -t prometheus_http_server /app
+      args:
+        chdir: /app
+     
+    - name: Запустить контейнер
+      docker_container:
+        name: prometheus_http_server
+        image: prometheus_http_server
+        state: started
+        restart_policy: always
+        published_ports:
+          - "8080:8080"
+
+#    - name: dfdf
+#      command: docker build -t prometheus_http_sever /app
+#        state: started
+       

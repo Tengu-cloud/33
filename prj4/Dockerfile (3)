@@ -1,0 +1,5 @@
+FROM centos:7
+COPY ./datomic-pro-1.0.6610 /opt/datomic-pro-1.0.6610
+COPY ./sql_postgres.properties /etc
+RUN yum install java-11-openjdk-devel -y
+CMD ["/opt/datomic-pro-1.0.6610/bin/transactor", "/etc/sql_postgres.properties"] 

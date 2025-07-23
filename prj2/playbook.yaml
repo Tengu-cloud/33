@@ -1,0 +1,45 @@
+- name: Установить и запустить HTTP сервер
+  hosts: vm
+  become: yes
+
+  tasks:
+    - name: Установить Python
+      yum:
+        name: python3
+        state: present
+ 
+    - name: Установить зависимости
+      pip:
+        name: prometheus_client
+        executable: pip
+    - name: dmicode
+      yum:
+        name: dmidecode
+        state: present
+ 
+    - name: Копировать сервер на ВМ
+      copy:
+        src: /app1/http_serv.py
+        dest: /opt/http_serv.py
+        mode: '0777'
+ 
+    - name: Настроить сервис systemd для сервера
+      copy:
+        content: |
+          [Unit]
+          Description=HTTP Server for Prometheus metrics
+ 
+          [Service]
+          ExecStart=/usr/bin/python3 /opt/http_serv.py
+          Restart=always
+ 
+          [Install]
+          WantedBy=multi-user.target
+        dest: /etc/systemd/system/prometheus_http_server.service
+        mode: '0777'
+ 
+    - name: Запустить и включить сервис
+      systemd:
+        name: prometheus_http_server
+        enabled: yes
+        state: started

@@ -1,0 +1,14 @@
+FROM centos:7
+RUN yum install -y https://download.postgresql.org/pub/repos/yum/reporpms/EL-7-x86_64/pgdg-redhat-repo-latest.noarch.rpm 
+RUN yum install -y postgresql11-server
+RUN mkdir /opt/postgres
+RUN chown postgres:postgres /opt/postgres
+EXPOSE 5432
+COPY ./pg_hba.conf /opt/
+RUN chown postgres:postgres -R /opt
+COPY entrypoint.sh /usr/local/bin/
+COPY ./sql /etc/datomic-pro-1.0.6610/bin/sql
+RUN chmod 777 /usr/local/bin/entrypoint.sh
+RUN chown postgres:postgres /usr/local/bin/entrypoint.sh
+USER postgres 
+ENTRYPOINT [ "/usr/local/bin/entrypoint.sh" ]
