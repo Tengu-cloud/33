@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service    #Это наш небольшой балансировщик нагрузки, чтобы сеанс не падал при смерти одного из подов
+metadata:
+  name: http-app
+  namespace: ourcoolnamespace
+spec:
+  selector:
+    app: http-app
+  type: ClusterIP
+  sessionAffinity: None #Тут зависит от того какое у нас приложение
+  ports:
+  - name: http-app
+    protocol: TCP
+    port: NULL
+    targetPort: 8080

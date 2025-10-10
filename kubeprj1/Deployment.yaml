@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: http-app
+  namespace: ourcoolnamespace
+spec:
+  replicas: 4    #Сразу создаем 4 реплики, т.к в начале требуется много ресурсов                
+  selector:
+    matchLabels:
+      app: http-app
+  template:
+    metadata:
+      labels:
+        app: http-app
+    cpec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution: #Используем soft-лок чтобы наши поды нигде не застряли при запуске           
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app: http-app
+                topologyKey: topology.kubernetes.io/zone   #Раскидваем поды поды по зонам для повышения отказоустойчивости
+            - weight: 90
+              podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app: http-app
+                topologyKey: kubernetes.io/hostname        #Аналогично по нодам т.к зон у нас всего 3
+      containers:
+        - name: http-app
+          image: NULL
+          ports:
+            - containerPort: 8080
+          resources:
+            requests:       #Устанавливаем запрос на средние значения указаные в ТЗ
+              cpu: "100m"                                  
+              memory: "128Mi"
+            limits:             #Устанавливаем максимальные значения. 
+              cpu: "400m"       
+              memory: "300Mi"         
+          livenessProbe:     #Проверяем не умер ли наш контейнер
+            httpGet:         #Можно добавить startupprobe, но с указаным временем 5-10сек. не обязательно
+              path: NULL                                   
+              port: 8080
