@@ -21,7 +21,7 @@ spec:
                 labelSelector:
                   matchLabels:
                     app: http-app
-                topologyKey: topology.kubernetes.io/zone   #Раскидваем поды поды по зонам для повышения отказоустойчивости
+                topologyKey: topology.kubernetes.io/zone   #Раскидваем поды по зонам для повышения отказоустойчивости
             - weight: 90
               podAffinityTerm:
                 labelSelector:
