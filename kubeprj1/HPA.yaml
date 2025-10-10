@@ -19,3 +19,17 @@ spec:
         averageUtilization: 50 #При первых запросах и пиковой загрузке мы будем использовать все изначальные 4 пода
                                #Ночью HPA будет снижать кол-во подов до 2(не ставим 1 для ситуации что приложение заработало
                                #но запросов нет и при начале трафика ему резко поплохеет) ну или он просто умрет и упадет все приложение 
+
+  behavior: 
+    scaleDown:
+      policies:
+      - periodSeconds: 300
+        type: Pods
+        value: 1
+      stabilizationWindowSeconds: 300
+    scaleUp:
+      policies:
+      - periodSeconds: 300
+        type: Pods
+        value: 1
+      stabilizationWindowSeconds: 300
